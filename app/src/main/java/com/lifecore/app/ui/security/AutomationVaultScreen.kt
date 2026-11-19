@@ -41,6 +41,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.lifecore.app.automation.ReminderWorker
+import com.lifecore.app.automation.parseReminderDelayMinutes
 import com.lifecore.app.data.local.VaultStore
 import com.lifecore.app.security.VaultCrypto
 import com.lifecore.app.ui.components.LifeCoreCard
@@ -64,8 +65,8 @@ fun AutomationVaultScreen(modifier: Modifier = Modifier) {
     var showResetConfirmation by rememberSaveable { mutableStateOf(false) }
 
     fun scheduleReminder() {
-        val minutes = delayMinutes.toLongOrNull()
-        if (reminderTitle.isBlank() || minutes == null || minutes !in 1L..10080L) {
+        val minutes = parseReminderDelayMinutes(delayMinutes)
+        if (reminderTitle.isBlank() || minutes == null || minutes == null) {
             reminderStatus = "Enter a title and delay from 1 to 10,080 minutes."
             return
         }
@@ -231,7 +232,7 @@ fun AutomationVaultScreen(modifier: Modifier = Modifier) {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), singleLine = true)
             Spacer(Modifier.height(8.dp))
             Button(onClick = { requestReminderScheduling() },
-                enabled = reminderTitle.isNotBlank() && (delayMinutes.toLongOrNull() ?: 0L) in 1L..10080L,
+                enabled = reminderTitle.isNotBlank() && parseReminderDelayMinutes(delayMinutes) != null,
                 modifier = Modifier.fillMaxWidth()) { Text("Schedule reminder") }
             OutlinedButton(onClick = {
                 WorkManager.getInstance(context).cancelUniqueWork(ReminderWorker.UNIQUE_WORK_NAME)

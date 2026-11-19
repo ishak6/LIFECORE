@@ -36,16 +36,16 @@ private data class DashboardWidget(
 )
 
 private val dashboardWidgets = listOf(
-    DashboardWidget("daily", "Daily overview", "A snapshot of today's tasks and priorities.", "No daily items yet"),
-    DashboardWidget("goals", "Goal progress", "Keep long-term goals visible as you plan your day.", "Goals will appear after you create them"),
-    DashboardWidget("habits", "Habit tracker", "Build consistency with a simple daily check-in.", "No habits created yet"),
-    DashboardWidget("focus", "Focus center", "A dedicated space for distraction-free work.", "Interactive focus tools arrive in M6"),
-    DashboardWidget("calendar", "Calendar", "See upcoming events and important dates.", "No events scheduled"),
-    DashboardWidget("notes", "Quick notes", "Capture a thought before it gets away.", "Your notes will appear here"),
-    DashboardWidget("memory", "Recent memory", "Return to journal entries and saved memories.", "No memories saved yet"),
-    DashboardWidget("projects", "Project status", "Keep active projects and next steps in view.", "No projects added yet"),
-    DashboardWidget("analytics", "Productivity insights", "Understand patterns in your completed work.", "Insights appear when activity data exists"),
-    DashboardWidget("reminders", "Reminders", "Keep important follow-ups from slipping through.", "No reminders set")
+    DashboardWidget("daily", "Daily overview", "A snapshot of today's tasks and priorities.", "Open Plan to review your saved tasks"),
+    DashboardWidget("goals", "Goal progress", "Keep long-term goals visible as you plan your day.", "Open Goals to review your progress"),
+    DashboardWidget("habits", "Habit tracker", "Build consistency with a simple daily check-in.", "Open Goals to check today's habits"),
+    DashboardWidget("focus", "Focus center", "A dedicated space for distraction-free work.", "Open Plan to start a focus session"),
+    DashboardWidget("calendar", "Calendar", "See upcoming events and important dates.", "Open Plan to view your weekly agenda"),
+    DashboardWidget("notes", "Quick notes", "Capture a thought before it gets away.", "Open Brain to view and edit your notes"),
+    DashboardWidget("memory", "Recent memory", "Return to journal entries and saved memories.", "Open Brain to review your journal"),
+    DashboardWidget("projects", "Project status", "Keep active projects and next steps in view.", "Open Project Center to manage projects"),
+    DashboardWidget("analytics", "Productivity insights", "Understand patterns in your completed work.", "Open Project Center for local activity summaries"),
+    DashboardWidget("reminders", "Reminders", "Keep important follow-ups from slipping through.", "Open Profile to schedule a reminder")
 )
 
 private val defaultWidgetIds = listOf("daily", "goals", "habits", "focus", "calendar", "notes")

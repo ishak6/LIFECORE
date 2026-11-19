@@ -30,6 +30,7 @@ import com.lifecore.app.ui.dashboard.LifeCoreDashboard
 import com.lifecore.app.ui.goals.GoalsHabitsScreen
 import com.lifecore.app.ui.brain.BrainMemoryScreen
 import com.lifecore.app.ui.plan.PlanFocusScreen
+import com.lifecore.app.ui.projects.ProjectsAnalyticsScreen
 
 private data class MainDestination(
     val label: String,
@@ -49,6 +50,7 @@ private val destinations = listOf(
 @Composable
 fun LifeCoreAppShell() {
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
+    var showProjectsCenter by rememberSaveable { mutableStateOf(false) }
     val selected = destinations[selectedIndex]
 
     Scaffold(
@@ -58,7 +60,7 @@ fun LifeCoreAppShell() {
                 destinations.forEachIndexed { index, destination ->
                     NavigationBarItem(
                         selected = selectedIndex == index,
-                        onClick = { selectedIndex = index },
+                        onClick = { selectedIndex = index; showProjectsCenter = false },
                         icon = {
                             Text(
                                 text = destination.symbol,
@@ -92,7 +94,7 @@ fun LifeCoreAppShell() {
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = selected.label,
+                        text = if (showProjectsCenter && selectedIndex == 0) "Projects" else selected.label,
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -110,8 +112,12 @@ fun LifeCoreAppShell() {
                 }
             }
 
+            if (showProjectsCenter && selectedIndex == 0) {
+                TextButton(onClick = { showProjectsCenter = false }) { Text("← Back to Home") }
+            }
             when (selectedIndex) {
-                0 -> LifeCoreDashboard(Modifier.weight(1f))
+                0 -> if (showProjectsCenter) ProjectsAnalyticsScreen(Modifier.weight(1f))
+                     else LifeCoreDashboard(Modifier.weight(1f), onOpenProjects = { showProjectsCenter = true })
                 1 -> GoalsHabitsScreen(Modifier.weight(1f))
                 2 -> BrainMemoryScreen(Modifier.weight(1f))
                 3 -> PlanFocusScreen(Modifier.weight(1f))

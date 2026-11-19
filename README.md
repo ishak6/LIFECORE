@@ -70,3 +70,8 @@ LIFECORE/
 - Local data stays on-device unless the user exports a backup.
 - Never claim an integration or capability is active until it is implemented and verified.
 - Do not merge to `main` or publish a production release without explicit approval.
+
+
+## Dashboard interaction update
+
+Dashboard widget cards now open their corresponding in-app destinations when tapped. Widget visibility, ordering, presets, and compact mode are persisted locally on the device. This update is under CI verification; it is not yet device-verified.

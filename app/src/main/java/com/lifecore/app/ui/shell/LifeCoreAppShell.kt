@@ -33,7 +33,7 @@ import com.lifecore.app.ui.goals.GoalsHabitsScreen
 import com.lifecore.app.ui.brain.BrainMemoryScreen
 import com.lifecore.app.ui.plan.PlanFocusScreen
 import com.lifecore.app.ui.projects.ProjectsAnalyticsScreen
-import com.lifecore.app.ui.security.AutomationVaultScreen
+import com.lifecore.app.ui.profile.ProfileCenterScreen
 
 private data class MainDestination(
     val label: String,
@@ -124,7 +124,7 @@ fun LifeCoreAppShell() {
                 1 -> GoalsHabitsScreen(Modifier.weight(1f))
                 2 -> BrainMemoryScreen(Modifier.weight(1f))
                 3 -> PlanFocusScreen(Modifier.weight(1f))
-                4 -> AutomationVaultScreen(Modifier.weight(1f))
+                4 -> ProfileCenterScreen(Modifier.weight(1f))
             }
         }
     }

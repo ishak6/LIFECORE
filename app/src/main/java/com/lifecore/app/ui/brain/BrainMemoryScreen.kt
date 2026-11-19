@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -47,6 +48,7 @@ fun BrainMemoryScreen(modifier: Modifier = Modifier) {
     var tagsText by rememberSaveable { mutableStateOf("") }
     var editingId by rememberSaveable { mutableStateOf<String?>(null) }
     var showEditor by rememberSaveable { mutableStateOf(false) }
+    var pendingDeleteId by rememberSaveable { mutableStateOf<String?>(null) }
 
     val filteredEntries = entries.filter { entry ->
         entry.isJournal == journalMode &&
@@ -70,6 +72,26 @@ fun BrainMemoryScreen(modifier: Modifier = Modifier) {
         tagsText = entry.tags.joinToString(", ")
         editingId = entry.id
         showEditor = true
+    }
+
+    if (pendingDeleteId != null) {
+        AlertDialog(
+            onDismissRequest = { pendingDeleteId = null },
+            title = { Text("Delete entry?") },
+            text = { Text("This note or journal entry will be permanently removed from this device.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    val id = pendingDeleteId
+                    if (id != null) {
+                        entries = entries.filterNot { it.id == id }
+                        store.saveEntries(entries)
+                        if (editingId == id) clearEditor()
+                    }
+                    pendingDeleteId = null
+                }) { Text("Delete") }
+            },
+            dismissButton = { TextButton(onClick = { pendingDeleteId = null }) { Text("Cancel") } }
+        )
     }
 
     Column(
@@ -216,10 +238,7 @@ fun BrainMemoryScreen(modifier: Modifier = Modifier) {
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             TextButton(onClick = { editEntry(entry) }) { Text("Edit") }
-                            TextButton(onClick = {
-                                entries = entries.filterNot { it.id == entry.id }
-                                store.saveEntries(entries)
-                            }) { Text("Delete") }
+                            TextButton(onClick = { pendingDeleteId = entry.id }) { Text("Delete") }
                         }
                     }
                 }

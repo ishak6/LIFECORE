@@ -51,7 +51,7 @@ class ReminderWorker(
             .setAutoCancel(true)
             .build()
 
-        manager.notify(id.toInt(), notification)
+        manager.notify(id.hashCode(), notification)
         return Result.success()
     }
 

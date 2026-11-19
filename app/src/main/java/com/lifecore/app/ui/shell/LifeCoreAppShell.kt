@@ -45,10 +45,10 @@ private data class MainDestination(
 
 private val destinations = listOf(
     MainDestination("Home", "⌂", "Your life, in one place", "A calm space to plan, remember and grow."),
-    MainDestination("Goals", "◎", "Make progress that matters", "Goal planning and progress tracking arrive in the Goals milestone."),
-    MainDestination("Brain", "✧", "Your personal knowledge space", "Notes, links, folders and personal memory arrive in the Brain milestone."),
-    MainDestination("Plan", "▦", "Make room for what matters", "Tasks, calendar and focus tools arrive in the Planning milestone."),
-    MainDestination("Profile", "◉", "Your LIFECORE space", "Account, preferences and package controls will be added in later milestones.")
+    MainDestination("Goals", "◎", "Make progress that matters", "Track goals and daily habits."),
+    MainDestination("Brain", "✧", "Your personal knowledge space", "Capture notes, journal entries and searchable tags."),
+    MainDestination("Plan", "▦", "Make room for what matters", "Manage tasks, a weekly agenda and focus sessions."),
+    MainDestination("Profile", "◉", "Your LIFECORE space", "Manage reminders, privacy, backups, packages and settings.")
 )
 
 @Composable

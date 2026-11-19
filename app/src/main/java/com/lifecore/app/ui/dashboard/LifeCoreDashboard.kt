@@ -29,7 +29,12 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.lifecore.app.data.local.GoalsHabitsStore
+import com.lifecore.app.data.local.ProjectStatus
+import com.lifecore.app.data.local.ProjectStore
+import com.lifecore.app.data.local.TaskStore
 import com.lifecore.app.ui.components.LifeCoreCard
+import java.time.LocalDate
 import com.lifecore.app.ui.components.LifeCoreSectionTitle
 
 private data class DashboardWidget(
@@ -67,6 +72,42 @@ fun LifeCoreDashboard(
     val preferences = remember(context) {
         context.getSharedPreferences(DASHBOARD_PREFS, Context.MODE_PRIVATE)
     }
+    // Use the same persistent stores as the Goals, Plan and Projects screens.
+    val tasks = remember(context) { TaskStore(context).loadTasks() }
+    val goalsStore = remember(context) { GoalsHabitsStore(context) }
+    val goals = remember(context) { goalsStore.loadGoals() }
+    val habits = remember(context) { goalsStore.loadHabits() }
+    val projects = remember(context) { ProjectStore(context).loadProjects() }
+
+    val today = LocalDate.now()
+    val todayString = today.toString()
+    val openTasks = tasks.count { !it.isCompleted }
+    val completedTasks = tasks.count { it.isCompleted }
+    val dueToday = tasks.count { !it.isCompleted && it.dueDate == todayString }
+    val overdue = tasks.count { !it.isCompleted && it.dueDate.isNotBlank() && it.dueDate < todayString }
+    val nextSevenDays = tasks.count {
+        !it.isCompleted && it.dueDate >= todayString && it.dueDate <= today.plusDays(6).toString()
+    }
+    val completedHabits = habits.count { it.isCompletedToday() }
+    val goalSteps = goals.sumOf { it.completedSteps }
+    val goalTargets = goals.sumOf { it.targetSteps }
+    val goalPercent = if (goalTargets == 0) 0 else (goalSteps * 100 / goalTargets).coerceIn(0, 100)
+    val activeProjects = projects.count { it.status == ProjectStatus.ACTIVE }
+    val completedProjects = projects.count { it.status == ProjectStatus.COMPLETED }
+
+    fun widgetMetric(widget: DashboardWidget): String = when (widget.id) {
+        "daily" -> "$openTasks open • $completedTasks completed • $dueToday due today • $overdue overdue"
+        "goals" -> if (goals.isEmpty()) "No goals saved yet" else "$goalPercent% overall • $goalSteps of $goalTargets steps"
+        "habits" -> if (habits.isEmpty()) "No habits saved yet" else "$completedHabits of ${habits.size} habits completed today"
+        "focus" -> "25-minute focus timer is available in Plan"
+        "calendar" -> "$nextSevenDays upcoming tasks in the next 7 days"
+        "projects" -> "$activeProjects active • $completedProjects completed"
+        "analytics" -> "$completedTasks tasks completed • ${projects.size} projects saved"
+        "notes", "memory" -> "Open Brain to create or search your saved notes"
+        "reminders" -> "Open Profile to manage scheduled reminders"
+        else -> widget.detail
+    }
+
     var editMode by rememberSaveable { mutableStateOf(false) }
     var compactMode by remember(preferences) {
         mutableStateOf(preferences.getBoolean(KEY_COMPACT, false))
@@ -86,7 +127,7 @@ fun LifeCoreDashboard(
 
     Column(
         modifier = modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(if (compactMode) 10.dp else 14.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
@@ -223,16 +264,19 @@ fun LifeCoreDashboard(
                     )
                     Spacer(Modifier.height(10.dp))
                 }
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Text(
-                        text = widget.availability,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                Text(
+                    text = widgetMetric(widget),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium
+                )
+                if (!editMode) {
+                    TextButton(
+                        onClick = { onOpenDestination(widget.destination) },
+                        modifier = Modifier.align(Alignment.Start)
+                    ) {
+                        Text("Open ${widget.destination.replaceFirstChar { it.uppercase() }}")
+                    }
                 }
             }
         }

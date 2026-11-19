@@ -28,12 +28,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.lifecore.app.data.local.GoalsHabitsStore
 import com.lifecore.app.data.local.ProjectItem
+import com.lifecore.app.data.local.calculateProgressPercent
 import com.lifecore.app.data.local.ProjectStatus
 import com.lifecore.app.data.local.ProjectStore
 import com.lifecore.app.data.local.TaskStore
 import com.lifecore.app.ui.components.LifeCoreCard
 import com.lifecore.app.ui.components.LifeCoreSectionTitle
-import java.time.LocalDate
 
 @Composable
 fun ProjectsAnalyticsScreen(modifier: Modifier = Modifier) {
@@ -54,10 +54,10 @@ fun ProjectsAnalyticsScreen(modifier: Modifier = Modifier) {
     }
     val completedTasks = tasks.count { it.isCompleted }
     val openTasks = tasks.size - completedTasks
-    val goalProgress = goals.sumOf { it.completedSteps }.let { completed ->
-        val total = goals.sumOf { it.targetSteps }
-        if (total == 0) 0 else (completed * 100 / total).coerceIn(0, 100)
-    }
+    val goalProgress = calculateProgressPercent(
+        goals.sumOf { it.completedSteps },
+        goals.sumOf { it.targetSteps }
+    )
     val habitsDoneToday = habits.count { it.isCompletedToday() }
 
     Column(

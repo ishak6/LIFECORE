@@ -57,7 +57,7 @@ class BrainMemoryStore(context: Context) {
         val array = JSONArray()
         entries.forEach { entry ->
             val tags = JSONArray()
-            entry.tags.map(String::trim).filter(String::isNotEmpty).distinct().forEach(tags::put)
+            entry.tags.map(String::trim).filter(String::isNotEmpty).distinct().forEach { tag -> tags.put(tag) }
             array.put(
                 JSONObject()
                     .put("id", entry.id)

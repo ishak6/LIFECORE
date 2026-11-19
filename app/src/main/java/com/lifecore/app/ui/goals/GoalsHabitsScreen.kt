@@ -35,7 +35,7 @@ import com.lifecore.app.ui.components.LifeCoreSectionTitle
 import java.time.LocalDate
 
 @Composable
-fun GoalsHabitsScreen() {
+fun GoalsHabitsScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val store = remember(context) { GoalsHabitsStore(context) }
     var goals by remember { mutableStateOf(store.loadGoals()) }
@@ -44,7 +44,7 @@ fun GoalsHabitsScreen() {
     var habitDraft by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+        modifier = modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {

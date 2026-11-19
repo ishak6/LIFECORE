@@ -1,5 +1,6 @@
 package com.lifecore.app.ui.profile
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -35,6 +36,8 @@ fun ProfileCenterScreen(
     modifier: Modifier = Modifier
 ) {
     var section by rememberSaveable { mutableStateOf("MENU") }
+
+    BackHandler(enabled = section != "MENU") { section = "MENU" }
 
     Column(modifier = modifier.fillMaxSize()) {
         if (section == "MENU") {

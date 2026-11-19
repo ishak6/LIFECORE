@@ -51,7 +51,7 @@ private val dashboardWidgets = listOf(
 private val defaultWidgetIds = listOf("daily", "goals", "habits", "focus", "calendar", "notes")
 
 @Composable
-fun LifeCoreDashboard(modifier: Modifier = Modifier) {
+fun LifeCoreDashboard(modifier: Modifier = Modifier, onOpenProjects: () -> Unit = {}) {
     var editMode by rememberSaveable { mutableStateOf(false) }
     var compactMode by rememberSaveable { mutableStateOf(false) }
     var visibleIds by rememberSaveable(
@@ -181,6 +181,11 @@ fun LifeCoreDashboard(modifier: Modifier = Modifier) {
                                 visibleIds = visibleIds.filterNot { it == widget.id }
                             }) { Text("Hide") }
                         }
+                    }
+                }
+                if (widget.id == "projects") {
+                    TextButton(onClick = onOpenProjects) {
+                        Text("Open project center")
                     }
                 }
                 if (!compactMode) {

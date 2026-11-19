@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -17,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,14 +51,14 @@ private val dashboardWidgets = listOf(
 private val defaultWidgetIds = listOf("daily", "goals", "habits", "focus", "calendar", "notes")
 
 @Composable
-fun LifeCoreDashboard() {
+fun LifeCoreDashboard(modifier: Modifier = Modifier) {
     var editMode by rememberSaveable { mutableStateOf(false) }
     var compactMode by rememberSaveable { mutableStateOf(false) }
-    var visibleIds by rememberSaveable { mutableStateOf(defaultWidgetIds) }
+    var visibleIds by rememberSaveable(\n        stateSaver = listSaver(save = { it.toList() }, restore = { it })\n    ) { mutableStateOf(defaultWidgetIds) }
     val visibleWidgets = visibleIds.mapNotNull { id -> dashboardWidgets.firstOrNull { it.id == id } }
     val availableWidgets = dashboardWidgets.filterNot { it.id in visibleIds }
 
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(\n        modifier = modifier.fillMaxWidth().verticalScroll(rememberScrollState()),\n        verticalArrangement = Arrangement.spacedBy(16.dp)\n    ) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
                 text = "Your life, in one place.",

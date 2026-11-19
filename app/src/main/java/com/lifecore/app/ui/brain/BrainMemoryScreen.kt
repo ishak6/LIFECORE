@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.lifecore.app.data.local.BrainEntry
 import com.lifecore.app.data.local.BrainMemoryStore
+import com.lifecore.app.data.local.parseBrainTags
 import com.lifecore.app.ui.components.LifeCoreCard
 import com.lifecore.app.ui.components.LifeCoreSectionTitle
 import java.text.DateFormat
@@ -38,13 +40,13 @@ fun BrainMemoryScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val store = remember(context) { BrainMemoryStore(context) }
     var entries by remember { mutableStateOf(store.loadEntries()) }
-    var journalMode by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
-    var title by remember { mutableStateOf("") }
-    var body by remember { mutableStateOf("") }
-    var tagsText by remember { mutableStateOf("") }
-    var editingId by remember { mutableStateOf<String?>(null) }
-    var showEditor by remember { mutableStateOf(false) }
+    var journalMode by rememberSaveable { mutableStateOf(false) }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var title by rememberSaveable { mutableStateOf("") }
+    var body by rememberSaveable { mutableStateOf("") }
+    var tagsText by rememberSaveable { mutableStateOf("") }
+    var editingId by rememberSaveable { mutableStateOf<String?>(null) }
+    var showEditor by rememberSaveable { mutableStateOf(false) }
 
     val filteredEntries = entries.filter { entry ->
         entry.isJournal == journalMode &&
@@ -141,7 +143,7 @@ fun BrainMemoryScreen(modifier: Modifier = Modifier) {
                     val cleanTitle = title.trim()
                     if (cleanTitle.isNotEmpty()) {
                         val now = System.currentTimeMillis()
-                        val tags = tagsText.split(",").map(String::trim).filter(String::isNotEmpty).distinct()
+                        val tags = parseBrainTags(tagsText)
                         val old = entries.firstOrNull { it.id == editingId }
                         val updated = BrainEntry(
                             id = old?.id ?: java.util.UUID.randomUUID().toString(),

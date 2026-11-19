@@ -110,7 +110,7 @@ fun LifeCoreAppShell() {
 
             when (selectedIndex) {
                 0 -> LifeCoreDashboard(Modifier.weight(1f))
-                1 -> GoalsHabitsScreen()
+                1 -> GoalsHabitsScreen(Modifier.weight(1f))
                 else -> DestinationPlaceholder(destination = selected)
             }
         }

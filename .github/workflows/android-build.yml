@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   android:
-    name: Build and test Android app
+    name: Build, unit test and emulator UI test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -44,7 +44,7 @@ jobs:
       - name: Install Android SDK packages
         run: sdkmanager "platforms;android-37.2" "build-tools;37.0.0"
 
-      - name: Build debug APK and run unit tests
+      - name: Build debug APK, run unit tests and lint
         run: |
           for attempt in 1 2 3; do
             if gradle --no-daemon --refresh-dependencies :app:assembleDebug :app:testDebugUnitTest :app:lintDebug; then
@@ -54,7 +54,40 @@ jobs:
           done
           exit 1
 
+      - name: Run Compose UI tests on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            set +e
+            gradle --no-daemon :app:connectedDebugAndroidTest
+            TEST_EXIT=$?
+            mkdir -p app/build/qa-evidence
+            adb logcat -d -v time > app/build/qa-evidence/logcat.txt
+            adb shell am force-stop com.lifecore.app
+            adb shell monkey -p com.lifecore.app 1
+            sleep 5
+            adb shell screencap -p /sdcard/lifecore-home.png
+            adb pull /sdcard/lifecore-home.png app/build/qa-evidence/home-screen.png
+            exit $TEST_EXIT
+
+      - name: Upload emulator QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecore-ui-qa-evidence
+          path: |
+            app/build/reports/androidTests/connected/**
+            app/build/outputs/androidTest-results/connected/**
+            app/build/qa-evidence/**
+          if-no-files-found: warn
+
       - name: Upload debug APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: lifecore-apk

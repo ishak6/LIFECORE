@@ -13,6 +13,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: lifecore-android-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   android:
     name: Build and test Android app

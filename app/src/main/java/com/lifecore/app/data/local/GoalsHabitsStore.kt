@@ -32,12 +32,13 @@ class GoalsHabitsStore(context: Context) {
         buildList {
             for (index in 0 until array.length()) {
                 val item = array.getJSONObject(index)
+                val target = item.optInt("targetSteps", 10).coerceAtLeast(1)
                 add(
                     GoalItem(
                         id = item.optString("id", UUID.randomUUID().toString()),
                         title = item.optString("title"),
-                        targetSteps = item.optInt("targetSteps", 10).coerceAtLeast(1),
-                        completedSteps = item.optInt("completedSteps", 0).coerceAtLeast(0)
+                        targetSteps = target,
+                        completedSteps = item.optInt("completedSteps", 0).coerceIn(0, target)
                     )
                 )
             }

@@ -45,11 +45,18 @@ jobs:
         run: sdkmanager "platforms;android-37.2" "build-tools;37.0.0"
 
       - name: Build debug APK and run unit tests
-        run: gradle --no-daemon --refresh-dependencies :app:assembleDebug :app:testDebugUnitTest
+        run: gradle --no-daemon --refresh-dependencies :app:assembleDebug :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: lifecore-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Upload unsigned release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifecore-release-unsigned-apk
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
           if-no-files-found: error

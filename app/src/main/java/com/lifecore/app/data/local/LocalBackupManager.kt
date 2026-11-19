@@ -148,7 +148,7 @@ object LocalBackupManager {
                 val tagArray = item.optJSONArray("tags") ?: JSONArray()
                 val tags = buildList {
                     for (j in 0 until tagArray.length()) {
-                        tagArray.optString(j).trim().takeIf { it.isNotEmpty() }?.let(::add)
+                        tagArray.optString(j).trim().takeIf { it.isNotEmpty() }?.let { tag -> add(tag) }
                     }
                 }.distinct()
                 add(BrainEntry(
@@ -168,13 +168,17 @@ object LocalBackupManager {
         for (i in 0 until array.length()) {
             val item = array.getJSONObject(i)
             val title = item.optString("title").trim()
-            if (title.isNotEmpty()) add(TaskItem(
-                id = item.optString("id").ifBlank { UUID.randomUUID().toString() },
-                title = title,
-                dueDate = item.optString("dueDate"),
-                isCompleted = item.optBoolean("isCompleted", false),
-                createdAt = item.optLong("createdAt", System.currentTimeMillis())
-            ))
+            if (title.isNotEmpty()) {
+                val dueDate = item.optString("dueDate")
+                require(isValidTaskDate(dueDate)) { "Backup contains an invalid task due date." }
+                add(TaskItem(
+                    id = item.optString("id").ifBlank { UUID.randomUUID().toString() },
+                    title = title,
+                    dueDate = dueDate,
+                    isCompleted = item.optBoolean("isCompleted", false),
+                    createdAt = item.optLong("createdAt", System.currentTimeMillis())
+                ))
+            }
         }
     }
 

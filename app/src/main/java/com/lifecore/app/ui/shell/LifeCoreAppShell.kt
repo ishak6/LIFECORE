@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.lifecore.app.ui.components.LifeCoreCard
 import com.lifecore.app.ui.components.LifeCoreSectionTitle
 import com.lifecore.app.ui.dashboard.LifeCoreDashboard
+import com.lifecore.app.ui.goals.GoalsHabitsScreen
 
 private data class MainDestination(
     val label: String,
@@ -109,6 +110,7 @@ fun LifeCoreAppShell() {
 
             when (selectedIndex) {
                 0 -> LifeCoreDashboard(Modifier.weight(1f))
+                1 -> GoalsHabitsScreen()
                 else -> DestinationPlaceholder(destination = selected)
             }
         }

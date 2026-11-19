@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +43,28 @@ fun GoalsHabitsScreen(modifier: Modifier = Modifier) {
     var habits by remember { mutableStateOf(store.loadHabits()) }
     var goalDraft by remember { mutableStateOf("") }
     var habitDraft by remember { mutableStateOf("") }
+    var pendingDelete by remember { mutableStateOf<Pair<String, String>?>(null) }
+
+    pendingDelete?.let { (itemId, itemType) ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            title = { Text(if (itemType == "GOAL") "Delete goal?" else "Delete habit?") },
+            text = { Text("This action permanently removes this item from this device.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (itemType == "GOAL") {
+                        goals = goals.filterNot { it.id == itemId }
+                        store.saveGoals(goals)
+                    } else {
+                        habits = habits.filterNot { it.id == itemId }
+                        store.saveHabits(habits)
+                    }
+                    pendingDelete = null
+                }) { Text("Delete") }
+            },
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text("Cancel") } }
+        )
+    }
 
     Column(
         modifier = modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
@@ -102,10 +125,7 @@ fun GoalsHabitsScreen(modifier: Modifier = Modifier) {
                         ) {
                             Text(goal.title, modifier = Modifier.weight(1f),
                                 style = MaterialTheme.typography.titleSmall)
-                            TextButton(onClick = {
-                                goals = goals.filterNot { it.id == goal.id }
-                                store.saveGoals(goals)
-                            }) { Text("Delete") }
+                            TextButton(onClick = { pendingDelete = goal.id to "GOAL" }) { Text("Delete") }
                         }
                         Text(
                             text = "${goal.completedSteps} of ${goal.targetSteps} steps",
@@ -175,10 +195,7 @@ fun GoalsHabitsScreen(modifier: Modifier = Modifier) {
                             }
                         )
                         Text(habit.title, modifier = Modifier.weight(1f))
-                        OutlinedButton(onClick = {
-                            habits = habits.filterNot { it.id == habit.id }
-                            store.saveHabits(habits)
-                        }) { Text("Remove") }
+                        OutlinedButton(onClick = { pendingDelete = habit.id to "HABIT" }) { Text("Remove") }
                     }
                 }
             }

@@ -54,11 +54,16 @@ private val defaultWidgetIds = listOf("daily", "goals", "habits", "focus", "cale
 fun LifeCoreDashboard(modifier: Modifier = Modifier) {
     var editMode by rememberSaveable { mutableStateOf(false) }
     var compactMode by rememberSaveable { mutableStateOf(false) }
-    var visibleIds by rememberSaveable(\n        stateSaver = listSaver(save = { it.toList() }, restore = { it })\n    ) { mutableStateOf(defaultWidgetIds) }
+    var visibleIds by rememberSaveable(
+        stateSaver = listSaver(save = { it.toList() }, restore = { it })
+    ) { mutableStateOf(defaultWidgetIds) }
     val visibleWidgets = visibleIds.mapNotNull { id -> dashboardWidgets.firstOrNull { it.id == id } }
     val availableWidgets = dashboardWidgets.filterNot { it.id in visibleIds }
 
-    Column(\n        modifier = modifier.fillMaxWidth().verticalScroll(rememberScrollState()),\n        verticalArrangement = Arrangement.spacedBy(16.dp)\n    ) {
+    Column(
+        modifier = modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
                 text = "Your life, in one place.",

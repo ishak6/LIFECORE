@@ -35,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -69,17 +68,16 @@ fun AutomationVaultScreen(modifier: Modifier = Modifier) {
     var vaultStatus by rememberSaveable { mutableStateOf("") }
     var showResetConfirmation by rememberSaveable { mutableStateOf(false) }
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner, activity) {
+    DisposableEffect(activity) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_STOP) {
                 vaultText = ""
                 vaultUnlocked = false
             }
         }
-        lifecycleOwner.lifecycle.addObserver(observer)
+        activity?.lifecycle?.addObserver(observer)
         onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
+            activity?.lifecycle?.removeObserver(observer)
             vaultText = ""
             vaultUnlocked = false
         }

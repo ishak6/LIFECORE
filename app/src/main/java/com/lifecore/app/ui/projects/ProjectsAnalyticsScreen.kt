@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +49,26 @@ fun ProjectsAnalyticsScreen(modifier: Modifier = Modifier) {
     var name by rememberSaveable { mutableStateOf("") }
     var description by rememberSaveable { mutableStateOf("") }
     var filter by rememberSaveable { mutableStateOf("ALL") }
+    var pendingDeleteProjectId by rememberSaveable { mutableStateOf<String?>(null) }
+
+    if (pendingDeleteProjectId != null) {
+        AlertDialog(
+            onDismissRequest = { pendingDeleteProjectId = null },
+            title = { Text("Delete project?") },
+            text = { Text("This project and its local status record will be permanently removed.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    val id = pendingDeleteProjectId
+                    if (id != null) {
+                        projects = projects.filterNot { it.id == id }
+                        projectStore.saveProjects(projects)
+                    }
+                    pendingDeleteProjectId = null
+                }) { Text("Delete") }
+            },
+            dismissButton = { TextButton(onClick = { pendingDeleteProjectId = null }) { Text("Cancel") } }
+        )
+    }
 
     val filteredProjects = projects.filter {
         filter == "ALL" || it.status.name == filter
@@ -199,10 +220,7 @@ fun ProjectsAnalyticsScreen(modifier: Modifier = Modifier) {
                                 }
                                 projectStore.saveProjects(projects)
                             }) { Text("Change status") }
-                            TextButton(onClick = {
-                                projects = projects.filterNot { it.id == project.id }
-                                projectStore.saveProjects(projects)
-                            }) { Text("Delete") }
+                            TextButton(onClick = { pendingDeleteProjectId = project.id }) { Text("Delete") }
                         }
                     }
                 }

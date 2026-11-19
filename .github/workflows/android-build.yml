@@ -45,7 +45,14 @@ jobs:
         run: sdkmanager "platforms;android-37.2" "build-tools;37.0.0"
 
       - name: Build debug APK and run unit tests
-        run: gradle --no-daemon --refresh-dependencies :app:assembleDebug :app:testDebugUnitTest
+        run: |
+          for attempt in 1 2 3; do
+            if gradle --no-daemon --refresh-dependencies :app:assembleDebug :app:testDebugUnitTest; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt * 15)); fi
+          done
+          exit 1
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4

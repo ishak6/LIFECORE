@@ -5,6 +5,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.UUID
 
+fun parseBrainTags(raw: String): List<String> = raw.split(",").map(String::trim).filter(String::isNotEmpty).distinct()
+
 data class BrainEntry(
     val id: String = UUID.randomUUID().toString(),
     val title: String,

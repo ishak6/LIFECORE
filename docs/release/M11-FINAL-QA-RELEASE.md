@@ -23,12 +23,17 @@ The final Android CI workflow runs:
 - [ ] Verify weekly task agenda and focus timer start/pause/reset.
 - [ ] Verify reminder permission flow and notification delivery.
 - [ ] Verify biometric vault create/unlock/save/lock/reset on a supported device.
+- [ ] Verify vault plaintext is not saved in Activity state, the vault auto-locks on app background, and screenshots are blocked while unlocked.
 - [ ] Export a backup, clear test data, restore and compare record counts.
 - [ ] Verify malformed/unsupported backup files do not overwrite local data.
 - [ ] Inspect app behavior offline.
 - [ ] Verify accessibility labels, font scaling, contrast and small-screen layouts.
 - [ ] Verify crash-free startup and navigation on supported Android API levels.
 - [ ] Review privacy/security and release notes.
+
+## Security hardening
+- Vault plaintext is kept in non-saveable in-memory Compose state, cleared on screen disposal and app background, and the window uses `FLAG_SECURE` while the vault is unlocked.
+- These protections reduce accidental exposure but do not replace OS/device security or physical-device penetration testing.
 
 ## Release limitations
 - A signed production APK requires a protected signing key and GitHub Actions secrets. No signing credentials were supplied, so CI intentionally produces an unsigned release APK and an installable debug APK.

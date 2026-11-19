@@ -46,6 +46,11 @@ object VaultCrypto {
         return iv to ciphertext
     }
 
+    fun deleteKey() {
+        val keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER).apply { load(null) }
+        if (keyStore.containsAlias(KEY_ALIAS)) keyStore.deleteEntry(KEY_ALIAS)
+    }
+
     private fun getOrCreateKey(): SecretKey {
         val keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER).apply { load(null) }
         (keyStore.getKey(KEY_ALIAS, null) as? SecretKey)?.let { return it }

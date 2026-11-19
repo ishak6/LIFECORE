@@ -124,7 +124,15 @@ fun LifeCoreAppShell(
             }
             when (selectedIndex) {
                 0 -> if (showProjectsCenter) ProjectsAnalyticsScreen(Modifier.weight(1f))
-                     else LifeCoreDashboard(Modifier.weight(1f), onOpenProjects = { showProjectsCenter = true })
+                     else LifeCoreDashboard(Modifier.weight(1f)) { destination ->
+                         when (destination) {
+                             "goals" -> selectedIndex = 1
+                             "brain" -> selectedIndex = 2
+                             "plan" -> selectedIndex = 3
+                             "profile" -> selectedIndex = 4
+                             "projects" -> showProjectsCenter = true
+                         }
+                     }
                 1 -> GoalsHabitsScreen(Modifier.weight(1f))
                 2 -> BrainMemoryScreen(Modifier.weight(1f))
                 3 -> PlanFocusScreen(Modifier.weight(1f))

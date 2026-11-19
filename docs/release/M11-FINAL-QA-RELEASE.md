@@ -19,6 +19,7 @@ The final Android CI workflow runs:
 - [ ] Verify Light, Dark and System themes.
 - [ ] Navigate Home, Goals, Brain, Plan and Profile.
 - [ ] Create/edit/delete goals, habits, notes, journal entries, tasks and projects.
+- [ ] Verify each destructive delete action requires explicit confirmation.
 - [ ] Verify local records survive process restart.
 - [ ] Verify weekly task agenda and focus timer start/pause/reset.
 - [ ] Verify reminder permission flow and notification delivery.

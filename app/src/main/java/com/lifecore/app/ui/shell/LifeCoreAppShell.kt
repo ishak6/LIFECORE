@@ -29,6 +29,7 @@ import com.lifecore.app.ui.components.LifeCoreSectionTitle
 import com.lifecore.app.ui.dashboard.LifeCoreDashboard
 import com.lifecore.app.ui.goals.GoalsHabitsScreen
 import com.lifecore.app.ui.brain.BrainMemoryScreen
+import com.lifecore.app.ui.plan.PlanFocusScreen
 
 private data class MainDestination(
     val label: String,
@@ -113,6 +114,7 @@ fun LifeCoreAppShell() {
                 0 -> LifeCoreDashboard(Modifier.weight(1f))
                 1 -> GoalsHabitsScreen(Modifier.weight(1f))
                 2 -> BrainMemoryScreen(Modifier.weight(1f))
+                3 -> PlanFocusScreen(Modifier.weight(1f))
                 else -> DestinationPlaceholder(destination = selected)
             }
         }

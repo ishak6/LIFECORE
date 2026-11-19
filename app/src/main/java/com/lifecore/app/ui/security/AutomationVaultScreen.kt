@@ -66,7 +66,7 @@ fun AutomationVaultScreen(modifier: Modifier = Modifier) {
 
     fun scheduleReminder() {
         val minutes = parseReminderDelayMinutes(delayMinutes)
-        if (reminderTitle.isBlank() || minutes == null || minutes == null) {
+        if (reminderTitle.isBlank() || minutes == null) {
             reminderStatus = "Enter a title and delay from 1 to 10,080 minutes."
             return
         }

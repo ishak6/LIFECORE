@@ -108,7 +108,7 @@ fun LifeCoreAppShell() {
             }
 
             when (selectedIndex) {
-                0 -> LifeCoreDashboard()
+                0 -> LifeCoreDashboard(Modifier.weight(1f))
                 else -> DestinationPlaceholder(destination = selected)
             }
         }

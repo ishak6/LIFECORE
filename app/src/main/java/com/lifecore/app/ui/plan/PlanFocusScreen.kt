@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -46,6 +47,7 @@ fun PlanFocusScreen(modifier: Modifier = Modifier) {
     var draftDate by rememberSaveable { mutableStateOf("") }
     var dateError by rememberSaveable { mutableStateOf(false) }
     var showCompleted by rememberSaveable { mutableStateOf(false) }
+    var selectedDate by rememberSaveable { mutableStateOf(LocalDate.now().toString()) }
     var remainingSeconds by rememberSaveable { mutableIntStateOf(25 * 60) }
     var isRunning by rememberSaveable { mutableStateOf(false) }
 
@@ -122,6 +124,53 @@ fun PlanFocusScreen(modifier: Modifier = Modifier) {
                 enabled = draftTitle.isNotBlank() && isValidTaskDate(draftDate),
                 modifier = Modifier.fillMaxWidth()
             ) { Text("Save task") }
+        }
+
+        LifeCoreCard {
+            LifeCoreSectionTitle("Weekly calendar")
+            Text(
+                text = "Choose a day to see its scheduled tasks.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                val startOfWeek = LocalDate.now().minusDays((LocalDate.now().dayOfWeek.value - 1).toLong())
+                (0L..6L).forEach { offset ->
+                    val date = startOfWeek.plusDays(offset)
+                    val value = date.toString()
+                    FilterChip(
+                        selected = selectedDate == value,
+                        onClick = { selectedDate = value },
+                        label = {
+                            Text("${date.dayOfWeek.name.take(3)} ${date.dayOfMonth}")
+                        }
+                    )
+                }
+            }
+            val dateTasks = tasks.filter { it.dueDate == selectedDate }
+            Text(
+                text = selectedDate,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+            if (dateTasks.isEmpty()) {
+                Text(
+                    text = "No tasks scheduled for this day.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                dateTasks.forEach { task ->
+                    Text(
+                        text = (if (task.isCompleted) "✓ " else "• ") + task.title,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
         }
 
         LifeCoreCard {

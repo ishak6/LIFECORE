@@ -4,7 +4,11 @@ plugins {
 }
 android {
     namespace = "com.lifecore.app"
-    compileSdk = 37
+    compileSdk {
+        version = release(37) {
+            minorApiLevel = 2
+        }
+    }
     defaultConfig {
         applicationId = "com.lifecore.app"
         minSdk = 26

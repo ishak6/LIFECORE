@@ -1,6 +1,6 @@
 package com.lifecore.app
 
-import androidx.compose.ui.test.assertExists
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -20,19 +20,19 @@ class MainNavigationUiTest {
     @Test
     fun bottomNavigationOpensEveryPrimaryScreen() {
         composeRule.onNodeWithText("Goals").performClick()
-        composeRule.onNodeWithText("Make progress that matters").assertExists()
+        composeRule.onNodeWithText("Make progress that matters").assertIsDisplayed()
 
         composeRule.onNodeWithText("Brain").performClick()
-        composeRule.onNodeWithText("Your knowledge space").assertExists()
+        composeRule.onNodeWithText("Your knowledge space").assertIsDisplayed()
 
         composeRule.onNodeWithText("Plan").performClick()
-        composeRule.onNodeWithText("Plan with intention").assertExists()
+        composeRule.onNodeWithText("Plan with intention").assertIsDisplayed()
 
         composeRule.onNodeWithText("Profile").performClick()
-        composeRule.onNodeWithText("Your LIFECORE space").assertExists()
+        composeRule.onNodeWithText("Your LIFECORE space").assertIsDisplayed()
 
         composeRule.onNodeWithText("Home").performClick()
-        composeRule.onNodeWithText("Your life, in one place.").assertExists()
+        composeRule.onNodeWithText("Your life, in one place.").assertIsDisplayed()
     }
 
     @Test
@@ -41,14 +41,14 @@ class MainNavigationUiTest {
         composeRule.onNodeWithText("Goals").performClick()
         composeRule.onNodeWithText("New goal").performTextInput(goalName)
         composeRule.onNodeWithText("Add goal").performClick()
-        composeRule.onNodeWithText(goalName).assertExists()
+        composeRule.onNodeWithText(goalName).assertIsDisplayed()
     }
 
     @Test
     fun profileSettingsSupportsSystemBackAndThemeSelection() {
         composeRule.onNodeWithText("Profile").performClick()
         composeRule.onNodeWithText("Open settings").performClick()
-        composeRule.onNodeWithText("Settings & Integrations").assertExists()
+        composeRule.onNodeWithText("Settings & Integrations").assertIsDisplayed()
 
         composeRule.onNodeWithText("Dark").performClick()
         composeRule.onNodeWithText("Dark").assertIsSelected()
@@ -56,6 +56,6 @@ class MainNavigationUiTest {
         composeRule.runOnUiThread {
             composeRule.activity.onBackPressedDispatcher.onBackPressed()
         }
-        composeRule.onNodeWithText("Your LIFECORE space").assertExists()
+        composeRule.onNodeWithText("Your LIFECORE space").assertIsDisplayed()
     }
 }

@@ -3,6 +3,7 @@ package com.lifecore.app.ui.security
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import android.view.WindowManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.biometric.BiometricManager
@@ -24,6 +25,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +33,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -59,10 +64,32 @@ fun AutomationVaultScreen(modifier: Modifier = Modifier) {
     var reminderMessage by rememberSaveable { mutableStateOf("") }
     var delayMinutes by rememberSaveable { mutableStateOf("15") }
     var reminderStatus by rememberSaveable { mutableStateOf("") }
-    var vaultText by rememberSaveable { mutableStateOf("") }
-    var vaultUnlocked by rememberSaveable { mutableStateOf(false) }
+    var vaultText by remember { mutableStateOf("") }
+    var vaultUnlocked by remember { mutableStateOf(false) }
     var vaultStatus by rememberSaveable { mutableStateOf("") }
     var showResetConfirmation by rememberSaveable { mutableStateOf(false) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner, activity) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                vaultText = ""
+                vaultUnlocked = false
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            vaultText = ""
+            vaultUnlocked = false
+        }
+    }
+    DisposableEffect(activity?.window, vaultUnlocked) {
+        val window = activity?.window
+        if (vaultUnlocked) window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        else window?.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        onDispose { window?.clearFlags(WindowManager.LayoutParams.FLAG_SECURE) }
+    }
 
     fun scheduleReminder() {
         val minutes = parseReminderDelayMinutes(delayMinutes)

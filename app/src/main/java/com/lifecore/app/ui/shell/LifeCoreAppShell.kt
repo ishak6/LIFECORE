@@ -34,6 +34,7 @@ import com.lifecore.app.ui.brain.BrainMemoryScreen
 import com.lifecore.app.ui.plan.PlanFocusScreen
 import com.lifecore.app.ui.projects.ProjectsAnalyticsScreen
 import com.lifecore.app.ui.profile.ProfileCenterScreen
+import com.lifecore.app.data.local.LifeCoreThemeMode
 
 private data class MainDestination(
     val label: String,
@@ -51,7 +52,10 @@ private val destinations = listOf(
 )
 
 @Composable
-fun LifeCoreAppShell() {
+fun LifeCoreAppShell(
+    themeMode: LifeCoreThemeMode,
+    onThemeModeChange: (LifeCoreThemeMode) -> Unit
+) {
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     var showProjectsCenter by rememberSaveable { mutableStateOf(false) }
     val selected = destinations[selectedIndex]
@@ -124,7 +128,7 @@ fun LifeCoreAppShell() {
                 1 -> GoalsHabitsScreen(Modifier.weight(1f))
                 2 -> BrainMemoryScreen(Modifier.weight(1f))
                 3 -> PlanFocusScreen(Modifier.weight(1f))
-                4 -> ProfileCenterScreen(Modifier.weight(1f))
+                4 -> ProfileCenterScreen(themeMode, onThemeModeChange, Modifier.weight(1f))
             }
         }
     }

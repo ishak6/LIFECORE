@@ -25,9 +25,15 @@ import com.lifecore.app.ui.components.LifeCoreCard
 import com.lifecore.app.ui.components.LifeCoreSectionTitle
 import com.lifecore.app.ui.packages.BackupPackagesScreen
 import com.lifecore.app.ui.security.AutomationVaultScreen
+import com.lifecore.app.data.local.LifeCoreThemeMode
+import com.lifecore.app.ui.settings.SettingsCenterScreen
 
 @Composable
-fun ProfileCenterScreen(modifier: Modifier = Modifier) {
+fun ProfileCenterScreen(
+    themeMode: LifeCoreThemeMode,
+    onThemeModeChange: (LifeCoreThemeMode) -> Unit,
+    modifier: Modifier = Modifier
+) {
     var section by rememberSaveable { mutableStateOf("MENU") }
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -54,6 +60,17 @@ fun ProfileCenterScreen(modifier: Modifier = Modifier) {
                     }
                 }
                 LifeCoreCard {
+                    LifeCoreSectionTitle("Settings & Integrations")
+                    Text(
+                        text = "Choose Light, Dark or System appearance and review connection status.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Button(onClick = { section = "SETTINGS" }, modifier = Modifier.fillMaxWidth()) {
+                        Text("Open settings")
+                    }
+                }
+                LifeCoreCard {
                     LifeCoreSectionTitle("Backup & Packages")
                     Text(
                         text = "Export or restore your local records and review the five planned package groups.",
@@ -70,6 +87,7 @@ fun ProfileCenterScreen(modifier: Modifier = Modifier) {
             when (section) {
                 "AUTOMATION" -> AutomationVaultScreen(Modifier.weight(1f))
                 "BACKUP" -> BackupPackagesScreen(Modifier.weight(1f))
+                "SETTINGS" -> SettingsCenterScreen(themeMode, onThemeModeChange, Modifier.weight(1f))
             }
         }
     }

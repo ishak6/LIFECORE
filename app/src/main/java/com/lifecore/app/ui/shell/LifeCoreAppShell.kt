@@ -1,5 +1,6 @@
 package com.lifecore.app.ui.shell
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,8 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.lifecore.app.ui.components.LifeCoreCard
-import com.lifecore.app.ui.components.LifeCoreSectionTitle
 import com.lifecore.app.ui.dashboard.LifeCoreDashboard
 import com.lifecore.app.ui.goals.GoalsHabitsScreen
 import com.lifecore.app.ui.brain.BrainMemoryScreen
@@ -38,17 +37,15 @@ import com.lifecore.app.data.local.LifeCoreThemeMode
 
 private data class MainDestination(
     val label: String,
-    val symbol: String,
-    val title: String,
-    val description: String
+    val symbol: String
 )
 
 private val destinations = listOf(
-    MainDestination("Home", "⌂", "Your life, in one place", "A calm space to plan, remember and grow."),
-    MainDestination("Goals", "◎", "Make progress that matters", "Track goals and daily habits."),
-    MainDestination("Brain", "✧", "Your personal knowledge space", "Capture notes, journal entries and searchable tags."),
-    MainDestination("Plan", "▦", "Make room for what matters", "Manage tasks, a weekly agenda and focus sessions."),
-    MainDestination("Profile", "◉", "Your LIFECORE space", "Manage reminders, privacy, backups, packages and settings.")
+    MainDestination("Home", "⌂"),
+    MainDestination("Goals", "◎"),
+    MainDestination("Brain", "✧"),
+    MainDestination("Plan", "▦"),
+    MainDestination("Profile", "◉")
 )
 
 @Composable
@@ -59,6 +56,10 @@ fun LifeCoreAppShell(
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     var showProjectsCenter by rememberSaveable { mutableStateOf(false) }
     val selected = destinations[selectedIndex]
+
+    BackHandler(enabled = showProjectsCenter && selectedIndex == 0) {
+        showProjectsCenter = false
+    }
 
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -138,27 +139,6 @@ fun LifeCoreAppShell(
                 3 -> PlanFocusScreen(Modifier.weight(1f))
                 4 -> ProfileCenterScreen(themeMode, onThemeModeChange, Modifier.weight(1f))
             }
-        }
-    }
-}
-
-@Composable
-private fun DestinationPlaceholder(destination: MainDestination) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(
-            text = destination.title,
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        LifeCoreCard {
-            LifeCoreSectionTitle("Coming in a later milestone")
-            Text(
-                text = destination.description,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }

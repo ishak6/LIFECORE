@@ -7,6 +7,13 @@ import java.util.UUID
 
 enum class ProjectStatus { ACTIVE, PAUSED, COMPLETED }
 
+fun parseProjectStatus(value: String): ProjectStatus = runCatching {
+    ProjectStatus.valueOf(value)
+}.getOrDefault(ProjectStatus.ACTIVE)
+
+fun calculateProgressPercent(completed: Int, total: Int): Int =
+    if (total <= 0) 0 else (completed.coerceAtLeast(0) * 100 / total).coerceIn(0, 100)
+
 data class ProjectItem(
     val id: String = UUID.randomUUID().toString(),
     val name: String,
@@ -28,9 +35,7 @@ class ProjectStore(context: Context) {
                 val item = array.getJSONObject(index)
                 val name = item.optString("name").trim()
                 if (name.isNotEmpty()) {
-                    val status = runCatching {
-                        ProjectStatus.valueOf(item.optString("status", ProjectStatus.ACTIVE.name))
-                    }.getOrDefault(ProjectStatus.ACTIVE)
+                    val status = parseProjectStatus(item.optString("status", ProjectStatus.ACTIVE.name))
                     add(
                         ProjectItem(
                             id = item.optString("id", UUID.randomUUID().toString()),

@@ -10,6 +10,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
@@ -50,6 +51,7 @@ fun PlanFocusScreen(modifier: Modifier = Modifier) {
     var selectedDate by rememberSaveable { mutableStateOf(LocalDate.now().toString()) }
     var remainingSeconds by rememberSaveable { mutableIntStateOf(25 * 60) }
     var isRunning by rememberSaveable { mutableStateOf(false) }
+    var pendingDeleteTaskId by rememberSaveable { mutableStateOf<String?>(null) }
 
     LaunchedEffect(isRunning, remainingSeconds) {
         if (isRunning && remainingSeconds > 0) {
@@ -58,6 +60,25 @@ fun PlanFocusScreen(modifier: Modifier = Modifier) {
         } else if (remainingSeconds == 0) {
             isRunning = false
         }
+    }
+
+    if (pendingDeleteTaskId != null) {
+        AlertDialog(
+            onDismissRequest = { pendingDeleteTaskId = null },
+            title = { Text("Delete task?") },
+            text = { Text("This task will be permanently removed from this device.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    val id = pendingDeleteTaskId
+                    if (id != null) {
+                        tasks = tasks.filterNot { it.id == id }
+                        store.saveTasks(tasks)
+                    }
+                    pendingDeleteTaskId = null
+                }) { Text("Delete") }
+            },
+            dismissButton = { TextButton(onClick = { pendingDeleteTaskId = null }) { Text("Cancel") } }
+        )
     }
 
     val visibleTasks = tasks.filter { showCompleted || !it.isCompleted }
@@ -223,10 +244,7 @@ fun PlanFocusScreen(modifier: Modifier = Modifier) {
                                 )
                             }
                         }
-                        TextButton(onClick = {
-                            tasks = tasks.filterNot { it.id == task.id }
-                            store.saveTasks(tasks)
-                        }) { Text("Delete") }
+                        TextButton(onClick = { pendingDeleteTaskId = task.id }) { Text("Delete") }
                     }
                 }
             }

@@ -66,7 +66,7 @@ jobs:
           test -w /dev/kvm
           ls -l /dev/kvm
 
-      - name: Run Compose UI tests on Android emulator
+      - name: Run Compose UI tests and verify fresh app launch
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -75,17 +75,15 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            set +e
             gradle --no-daemon :app:connectedDebugAndroidTest
-            TEST_EXIT=$?
+            adb install -r app/build/outputs/apk/debug/app-debug.apk
+            adb shell pm path com.lifecore.app
+            adb shell am start -W -n com.lifecore.app/.MainActivity
+            sleep 5
             mkdir -p app/build/qa-evidence
             adb logcat -d -v time > app/build/qa-evidence/logcat.txt
-            adb shell am force-stop com.lifecore.app
-            adb shell monkey -p com.lifecore.app 1
-            sleep 5
             adb shell screencap -p /sdcard/lifecore-home.png
             adb pull /sdcard/lifecore-home.png app/build/qa-evidence/home-screen.png
-            exit $TEST_EXIT
 
       - name: Upload emulator QA evidence
         if: always()
@@ -99,9 +97,9 @@ jobs:
           if-no-files-found: warn
 
       - name: Upload debug APK
-        if: success()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: lifecore-apk
           path: app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
+          if-no-files-found: warn

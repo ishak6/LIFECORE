@@ -45,13 +45,28 @@ class MainNavigationUiTest {
     }
 
     @Test
-    fun profileSettingsSupportsSystemBackAndThemeSelection() {
+    fun allThemeModesCanBeSelectedAndPrimaryScreensRemainVisible() {
         composeRule.onNodeWithText("Profile").performClick()
         composeRule.onNodeWithText("Open settings").performClick()
         composeRule.onNodeWithText("Settings & Integrations").assertIsDisplayed()
 
-        composeRule.onNodeWithText("Dark").performClick()
-        composeRule.onNodeWithText("Dark").assertIsSelected()
+        listOf("Light", "Dark", "System").forEach { mode ->
+            composeRule.onNodeWithText(mode).performClick()
+            composeRule.onNodeWithText(mode).assertIsSelected()
+
+            composeRule.onNodeWithText("Home").performClick()
+            composeRule.onNodeWithText("Your life, in one place.").assertIsDisplayed()
+            composeRule.onNodeWithText("Goals").performClick()
+            composeRule.onNodeWithText("Make progress that matters").assertIsDisplayed()
+            composeRule.onNodeWithText("Brain").performClick()
+            composeRule.onNodeWithText("Your knowledge space").assertIsDisplayed()
+            composeRule.onNodeWithText("Plan").performClick()
+            composeRule.onNodeWithText("Plan with intention").assertIsDisplayed()
+            composeRule.onNodeWithText("Profile").performClick()
+            composeRule.onNodeWithText("Your LIFECORE space").assertIsDisplayed()
+            composeRule.onNodeWithText("Open settings").performClick()
+            composeRule.onNodeWithText("Settings & Integrations").assertIsDisplayed()
+        }
 
         composeRule.runOnUiThread {
             composeRule.activity.onBackPressedDispatcher.onBackPressed()

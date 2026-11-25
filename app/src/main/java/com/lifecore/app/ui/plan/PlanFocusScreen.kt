@@ -52,6 +52,10 @@ fun PlanFocusScreen(modifier: Modifier = Modifier) {
     var remainingSeconds by rememberSaveable { mutableIntStateOf(25 * 60) }
     var isRunning by rememberSaveable { mutableStateOf(false) }
     var pendingDeleteTaskId by rememberSaveable { mutableStateOf<String?>(null) }
+    var editingTaskId by rememberSaveable { mutableStateOf<String?>(null) }
+    var editTaskTitle by rememberSaveable { mutableStateOf("") }
+    var editTaskDate by rememberSaveable { mutableStateOf("") }
+    var editTaskDateError by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(isRunning, remainingSeconds) {
         if (isRunning && remainingSeconds > 0) {
@@ -60,6 +64,57 @@ fun PlanFocusScreen(modifier: Modifier = Modifier) {
         } else if (remainingSeconds == 0) {
             isRunning = false
         }
+    }
+
+    if (editingTaskId != null) {
+        AlertDialog(
+            onDismissRequest = { editingTaskId = null },
+            title = { Text("Edit task") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = editTaskTitle,
+                        onValueChange = { editTaskTitle = it },
+                        label = { Text("Task name") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = editTaskDate,
+                        onValueChange = {
+                            editTaskDate = it
+                            editTaskDateError = !isValidTaskDate(it)
+                        },
+                        label = { Text("Due date (YYYY-MM-DD, optional)") },
+                        singleLine = true,
+                        isError = editTaskDateError,
+                        supportingText = {
+                            if (editTaskDateError) Text("Enter a valid date or leave it blank.")
+                        }
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = editTaskTitle.isNotBlank() && isValidTaskDate(editTaskDate),
+                    onClick = {
+                        val id = editingTaskId
+                        if (id != null) {
+                            tasks = tasks.map { task ->
+                                if (task.id == id) task.copy(
+                                    title = editTaskTitle.trim(),
+                                    dueDate = editTaskDate.trim()
+                                ) else task
+                            }
+                            store.saveTasks(tasks)
+                        }
+                        editingTaskId = null
+                    }
+                ) { Text("Save changes") }
+            },
+            dismissButton = {
+                TextButton(onClick = { editingTaskId = null }) { Text("Cancel") }
+            }
+        )
     }
 
     if (pendingDeleteTaskId != null) {
@@ -244,6 +299,12 @@ fun PlanFocusScreen(modifier: Modifier = Modifier) {
                                 )
                             }
                         }
+                        TextButton(onClick = {
+                            editingTaskId = task.id
+                            editTaskTitle = task.title
+                            editTaskDate = task.dueDate
+                            editTaskDateError = false
+                        }) { Text("Edit") }
                         TextButton(onClick = { pendingDeleteTaskId = task.id }) { Text("Delete") }
                     }
                 }

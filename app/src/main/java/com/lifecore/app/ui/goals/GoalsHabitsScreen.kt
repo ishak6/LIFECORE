@@ -44,6 +44,86 @@ fun GoalsHabitsScreen(modifier: Modifier = Modifier) {
     var goalDraft by remember { mutableStateOf("") }
     var habitDraft by remember { mutableStateOf("") }
     var pendingDelete by remember { mutableStateOf<Pair<String, String>?>(null) }
+    var editingGoalId by remember { mutableStateOf<String?>(null) }
+    var editGoalTitle by remember { mutableStateOf("") }
+    var editGoalTarget by remember { mutableStateOf("10") }
+    var editingHabitId by remember { mutableStateOf<String?>(null) }
+    var editHabitTitle by remember { mutableStateOf("") }
+
+    if (editingGoalId != null) {
+        AlertDialog(
+            onDismissRequest = { editingGoalId = null },
+            title = { Text("Edit goal") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = editGoalTitle,
+                        onValueChange = { editGoalTitle = it },
+                        label = { Text("Goal name") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = editGoalTarget,
+                        onValueChange = { editGoalTarget = it.filter(Char::isDigit).take(4) },
+                        label = { Text("Target steps") },
+                        singleLine = true
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = editGoalTitle.isNotBlank() && (editGoalTarget.toIntOrNull() ?: 0) > 0,
+                    onClick = {
+                        val id = editingGoalId
+                        val target = editGoalTarget.toIntOrNull()
+                        if (id != null && target != null && target > 0) {
+                            goals = goals.map { goal ->
+                                if (goal.id == id) goal.copy(
+                                    title = editGoalTitle.trim(),
+                                    targetSteps = target,
+                                    completedSteps = goal.completedSteps.coerceAtMost(target)
+                                ) else goal
+                            }
+                            store.saveGoals(goals)
+                        }
+                        editingGoalId = null
+                    }
+                ) { Text("Save changes") }
+            },
+            dismissButton = { TextButton(onClick = { editingGoalId = null }) { Text("Cancel") } }
+        )
+    }
+
+    if (editingHabitId != null) {
+        AlertDialog(
+            onDismissRequest = { editingHabitId = null },
+            title = { Text("Edit habit") },
+            text = {
+                OutlinedTextField(
+                    value = editHabitTitle,
+                    onValueChange = { editHabitTitle = it },
+                    label = { Text("Habit name") },
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = editHabitTitle.isNotBlank(),
+                    onClick = {
+                        val id = editingHabitId
+                        if (id != null) {
+                            habits = habits.map { habit ->
+                                if (habit.id == id) habit.copy(title = editHabitTitle.trim()) else habit
+                            }
+                            store.saveHabits(habits)
+                        }
+                        editingHabitId = null
+                    }
+                ) { Text("Save changes") }
+            },
+            dismissButton = { TextButton(onClick = { editingHabitId = null }) { Text("Cancel") } }
+        )
+    }
 
     pendingDelete?.let { (itemId, itemType) ->
         AlertDialog(
@@ -125,6 +205,11 @@ fun GoalsHabitsScreen(modifier: Modifier = Modifier) {
                         ) {
                             Text(goal.title, modifier = Modifier.weight(1f),
                                 style = MaterialTheme.typography.titleSmall)
+                            TextButton(onClick = {
+                                editingGoalId = goal.id
+                                editGoalTitle = goal.title
+                                editGoalTarget = goal.targetSteps.toString()
+                            }) { Text("Edit") }
                             TextButton(onClick = { pendingDelete = goal.id to "GOAL" }) { Text("Delete") }
                         }
                         Text(
@@ -195,6 +280,10 @@ fun GoalsHabitsScreen(modifier: Modifier = Modifier) {
                             }
                         )
                         Text(habit.title, modifier = Modifier.weight(1f))
+                        TextButton(onClick = {
+                            editingHabitId = habit.id
+                            editHabitTitle = habit.title
+                        }) { Text("Edit") }
                         OutlinedButton(onClick = { pendingDelete = habit.id to "HABIT" }) { Text("Remove") }
                     }
                 }

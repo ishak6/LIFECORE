@@ -60,6 +60,29 @@ class MainNavigationUiTest {
     }
 
     @Test
+    fun goalsAndHabitsCanBeEditedAndPersistedOnScreen() {
+        val suffix = System.currentTimeMillis().toString()
+        val goalTitle = "UI goal $suffix"
+        val habitTitle = "UI habit $suffix"
+        composeRule.onNodeWithText("Goals").performClick()
+        composeRule.onNodeWithText("New goal").performTextInput(goalTitle)
+        composeRule.onNodeWithText("Add goal").performClick()
+        composeRule.onNodeWithText(goalTitle).assertIsDisplayed()
+        composeRule.onNodeWithText("Edit").performClick()
+        composeRule.onNodeWithText("Goal name").performTextInput(" revised")
+        composeRule.onNodeWithText("Save changes").performClick()
+        composeRule.onNodeWithText("$goalTitle revised").assertIsDisplayed()
+
+        composeRule.onNodeWithText("New habit").performTextInput(habitTitle)
+        composeRule.onNodeWithText("Add habit").performClick()
+        composeRule.onNodeWithText(habitTitle).assertIsDisplayed()
+        composeRule.onAllNodesWithText("Edit")[1].performClick()
+        composeRule.onNodeWithText("Habit name").performTextInput(" revised")
+        composeRule.onNodeWithText("Save changes").performClick()
+        composeRule.onNodeWithText("$habitTitle revised").assertIsDisplayed()
+    }
+
+    @Test
     fun allThemeModesCanBeSelectedAndPrimaryScreensRemainVisible() {
         composeRule.onNodeWithText("Profile").performClick()
         composeRule.onNodeWithText("Open settings").performClick()

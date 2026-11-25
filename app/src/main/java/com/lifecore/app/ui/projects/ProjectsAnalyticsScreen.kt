@@ -50,6 +50,54 @@ fun ProjectsAnalyticsScreen(modifier: Modifier = Modifier) {
     var description by rememberSaveable { mutableStateOf("") }
     var filter by rememberSaveable { mutableStateOf("ALL") }
     var pendingDeleteProjectId by rememberSaveable { mutableStateOf<String?>(null) }
+    var editingProjectId by rememberSaveable { mutableStateOf<String?>(null) }
+    var editProjectName by rememberSaveable { mutableStateOf("") }
+    var editProjectDescription by rememberSaveable { mutableStateOf("") }
+
+    if (editingProjectId != null) {
+        AlertDialog(
+            onDismissRequest = { editingProjectId = null },
+            title = { Text("Edit project") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = editProjectName,
+                        onValueChange = { editProjectName = it },
+                        label = { Text("Project name") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = editProjectDescription,
+                        onValueChange = { editProjectDescription = it },
+                        label = { Text("Description (optional)") },
+                        minLines = 2
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = editProjectName.isNotBlank(),
+                    onClick = {
+                        val id = editingProjectId
+                        if (id != null) {
+                            projects = projects.map { project ->
+                                if (project.id == id) project.copy(
+                                    name = editProjectName.trim(),
+                                    description = editProjectDescription.trim(),
+                                    updatedAt = System.currentTimeMillis()
+                                ) else project
+                            }
+                            projectStore.saveProjects(projects)
+                        }
+                        editingProjectId = null
+                    }
+                ) { Text("Save changes") }
+            },
+            dismissButton = {
+                TextButton(onClick = { editingProjectId = null }) { Text("Cancel") }
+            }
+        )
+    }
 
     if (pendingDeleteProjectId != null) {
         AlertDialog(
@@ -220,6 +268,11 @@ fun ProjectsAnalyticsScreen(modifier: Modifier = Modifier) {
                                 }
                                 projectStore.saveProjects(projects)
                             }) { Text("Change status") }
+                            TextButton(onClick = {
+                                editingProjectId = project.id
+                                editProjectName = project.name
+                                editProjectDescription = project.description
+                            }) { Text("Edit") }
                             TextButton(onClick = { pendingDeleteProjectId = project.id }) { Text("Delete") }
                         }
                     }

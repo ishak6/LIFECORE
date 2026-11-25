@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -42,6 +43,20 @@ class MainNavigationUiTest {
         composeRule.onNodeWithText("New goal").performTextInput(goalName)
         composeRule.onNodeWithText("Add goal").performClick()
         composeRule.onNodeWithText(goalName).assertIsDisplayed()
+    }
+
+    @Test
+    fun taskCanBeCreatedEditedAndSaved() {
+        val originalTitle = "UI task " + System.currentTimeMillis()
+        val updatedTitle = "$originalTitle updated"
+        composeRule.onNodeWithText("Plan").performClick()
+        composeRule.onNodeWithText("Task name").performTextInput(originalTitle)
+        composeRule.onNodeWithText("Save task").performClick()
+        composeRule.onNodeWithText(originalTitle).assertIsDisplayed()
+        composeRule.onNodeWithText("Edit").performClick()
+        composeRule.onAllNodesWithText("Task name")[1].performTextInput(updatedTitle)
+        composeRule.onNodeWithText("Save changes").performClick()
+        composeRule.onNodeWithText(updatedTitle).assertIsDisplayed()
     }
 
     @Test
